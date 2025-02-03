@@ -10,7 +10,7 @@ const Card: FC<cardProp> = ({ title, icon, children }) => {
     return (
         <div className="card mb-2">
             <div className="card-header d-flex align-items-center">
-                <div className="fs-4">{icon}</div>
+                <div className={`fs-4 ${title === "To Do" ? "text-primary" : title === "In Progress" ? "text-warning" : "text-success"}`}>{icon}</div>
                 <h4 className="ms-2 mt-2">{title}</h4>
             </div>
             <div className="card-body">

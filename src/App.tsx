@@ -10,6 +10,23 @@ interface list {
   status: string
 }
 
+export const formattedData = (data: any, list?: any) => {
+  let objData: any = {
+    id: list,
+    title: data.title,
+    category: data.category?.map((cat: any) => cat.value) || [],
+    status: (data.status as any)?.value || ""
+  }
+
+  if (list && list.length) {
+    objData.id = list.length + 1
+    objData.category = data.category?.map((cat: any) => cat.value) || []
+    objData.status = (data.status as any)?.value || ""
+  }
+
+  return objData
+};
+
 const App = () => {
   const getStoredList = (): list[] => {
     const storedList = localStorage.getItem("list");
@@ -18,14 +35,9 @@ const App = () => {
   const [list, setList] = useState<list[]>(getStoredList())
 
   const onSubmit = (data: any) => {
-    const formattedData: list = {
-      id: list.length + 1,
-      title: data.title,
-      category: data.category?.map((cat: any) => cat.value) || [],
-      status: (data.status as any)?.value || "",
-    };
+    const updatedData = formattedData(data, list)
     localStorage.setItem("list", JSON.stringify(list))
-    setList(prevList => [...prevList, formattedData])
+    setList(prevList => [...prevList, updatedData])
   }
 
   useEffect(() => {

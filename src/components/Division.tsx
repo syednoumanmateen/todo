@@ -1,9 +1,10 @@
 import { FC, memo, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
-import { MdOutlineAddToPhotos, MdOutlineDelete } from "react-icons/md";
+import { MdOutlineDelete } from "react-icons/md";
 import { ListItem, ListProps } from "./List";
 import Form from "./Form";
 import { IoMdCloseCircleOutline } from "react-icons/io";
+import { formattedData } from "../App";
 
 interface EditId {
     id: number;
@@ -21,65 +22,64 @@ const Division: FC<ListProps> = ({ list, setList }) => {
 
     const handleClose = () => {
         setEditId({ id: 0, toggle: false });
-    }
+    };
 
-    const handleSave = () => {
+    const handleSave = (data: any, id: number) => {
         if (!editData) return;
 
-        setList((prevList: any) => prevList.map((itm: any) => (itm.id === editData.id ? editData : itm)));
-
+        setList((prevList: Array<any>) => prevList.map((itm) => itm.id === editData.id ? formattedData(data, id) : itm));
         setEditId({ id: 0, toggle: false });
-        setEditData(null);
     };
 
     const onDelete = (id: number) => {
-        setList((prevList: any) => prevList.filter((itm: any) => itm.id !== id));
+        setList((prevList: Array<any>) => prevList.filter((itm) => itm.id !== id).map((it: any, ind: number) => ({ ...it, id: ind + 1 })));
     };
 
     return (
         <>
-            {list && list.length > 0 && list.map((lst) => (
-                <div key={lst.id} className="row">
-                    <div className="col-12">
-                        <div className="card mb-3">
-                            <div className="card-body">
-                                <div className="d-flex mb-3">
-                                    {editId.id === lst.id ? (
-                                        <div>
-                                            <div className="d-flex">
-                                                <h5>Edit</h5><button className="btn p-0 fs-5 ms-auto" onClick={() => handleClose()}><IoMdCloseCircleOutline /></button>
+            {Array.isArray(list) ? (
+                list?.map((lst: any, index: number) => (
+                    <div key={index} className="row">
+                        <div className="col-12">
+                            <div className="card mb-3">
+                                <div className="card-body">
+                                    <div className="d-flex mb-3">
+                                        {editId.id === lst.id ? (
+                                            <div>
+                                                <div className="d-flex">
+                                                    <h5>Edit</h5>
+                                                    <button className="btn p-0 fs-5 ms-auto" onClick={handleClose}><IoMdCloseCircleOutline /></button>
+                                                </div>
+                                                <hr />
+                                                <Form onSubmit={(data: any) => { handleSave(data, editId.id) }} item={lst} />
                                             </div>
-                                            <hr />
-                                            <Form onSubmit={handleSave} item={lst} />
-                                        </div>
-                                    ) : (
-                                        <div className="me-2">
-                                            <h5 className="card-title">{lst.title}</h5>
-                                            <p className={`card-text ${lst.status === "To Do" ? "text-primary" : lst.status === "In Progress" ? "text-warning" : "text-success"}`}>{lst.status}</p>
-                                        </div>
-                                    )}
-                                    <div className="d-flex ms-auto">
-                                        {editId.id !== lst.id && (
-                                            <>
-                                                <button className="btn p-0 fs-5 text-warning" onClick={() => handleEdit(lst)}><FaRegEdit /></button>
-                                                <button className="btn p-0 fs-5 text-danger" onClick={() => onDelete(lst.id)}><MdOutlineDelete /></button>
-                                            </>
+                                        ) : (
+                                            <div className="me-2">
+                                                <h5 className="card-title">{lst.title}</h5>
+                                                <p className={`card-text ${lst.status === "To Do" ? "text-primary" : lst.status === "In Progress" ? "text-warning" : "text-success"}`}>{lst.status}</p>
+                                            </div>
                                         )}
+                                        <div className="d-flex ms-auto">
+                                            {editId.id !== lst.id && (
+                                                <>
+                                                    <button className="btn p-0 fs-5 text-warning" onClick={() => handleEdit(lst)}><FaRegEdit /></button>
+                                                    <button className="btn p-0 fs-5 text-danger" onClick={() => onDelete(lst.id)}><MdOutlineDelete /></button>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                <div>
-                                    {editId.id !== lst.id && lst?.category?.map((cat, ind) => (
-                                        <span key={ind} className="badge rounded text-bg-primary me-1">{cat}</span>
-                                    ))}
+                                    <div>
+                                        {editId.id !== lst.id && Array.isArray(lst.category) && lst.category.map((cat: any, indy: number) => (<span key={indy} className="badge rounded text-bg-primary me-1">{cat}</span>))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            ))}
-            {list && !list.length && <h6 className="text-center">NO Data Found</h6>}
+                ))
+            ) : (
+                <h6 className="text-center">NO Data Found</h6>
+            )}
         </>
-
     );
 };
 

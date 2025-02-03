@@ -1,4 +1,4 @@
-import { FC, memo } from "react";
+import { FC, memo, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { MdOutlineAddToPhotos } from "react-icons/md";
 import Select from "react-select";
@@ -44,20 +44,28 @@ const Form: FC<FormProps> = ({ onSubmit, item }) => {
             status: { label: "Choose Status", value: "" }
         });
     }
-    
+
+    if (item) {
+        reset({
+            title: item.title,
+            category: item?.category.map((itm: string) => ({ "label": itm, "value": itm })),
+            status: { "label": item?.status, "value": item?.status }
+        });
+    }
+
     return (
         <form onSubmit={handleSubmit(fSubmit)} className="row g-3">
             <div className="col-12">
-                <label className="form-label">Title</label>
-                <input {...register("title", { required: true })} type="text" className="form-control" placeholder="Title" />
+                <label className="form-label">Title</label><span className="ms-1" style={{ color: "red" }}>*</span>
+                <input {...register("title", { required: "Please Enter Title" })} value={item?.title} type="text" className="form-control" placeholder="Title" />
             </div>
-            <div className="col-sm-6 col-12">
+            <div className={`${!item ? "col-sm-6" : "col-12"}`}>
+                <label className="form-label">Status</label><span className="ms-1" style={{ color: "red" }}>*</span>
+                <Controller name="status" control={control} rules={{ required: "Please Choose Status" }} render={({ field }) => (<Select {...field} options={statuses} />)} />
+            </div>
+            <div className={`${!item ? "col-sm-6" : "col-12"}`}>
                 <label className="form-label">Category</label>
                 <Controller name="category" control={control} render={({ field }) => (<Select {...field} options={categories} isMulti />)} />
-            </div>
-            <div className="col-sm-6 col-12">
-                <label className="form-label">Status</label>
-                <Controller name="status" control={control} render={({ field }) => (<Select {...field} options={statuses} />)} />
             </div>
             <div className="d-flex justify-content-end">
                 <button className="btn btn-primary" type="submit"><MdOutlineAddToPhotos /> Add</button>

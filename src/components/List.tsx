@@ -27,8 +27,8 @@ const List: FC<ListProps> = ({ list, setList }) => {
   return (
     <div className="container-fluid p-0">
       <div className="row g-2">
-        {statusList.map((status: any) => (
-          <div key={status.title} className="col-sm-4 col-12">
+        {statusList.map((status: any, ind: number) => (
+          <div key={ind} className="col-sm-4 col-12">
             <Card title={status.title} icon={status.icon}>
               <div className="overflow-auto sc-l-height">
                 <Division list={list.filter((task) => task.status === status.title)} setList={setList} />
