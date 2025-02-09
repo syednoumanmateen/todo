@@ -1,4 +1,4 @@
-import { FC, memo } from "react";
+import { DragEvent, FC, memo } from "react";
 import Division from "./Division";
 import Card from "./Card";
 import { FaBarsProgress } from "react-icons/fa6";
@@ -24,11 +24,24 @@ const statusList = [
 ];
 
 const List: FC<ListProps> = ({ list, setList }) => {
+  const onDrop = (event: DragEvent, newStatus: string) => {
+    event.preventDefault();
+    const id = parseInt(event.dataTransfer.getData("id"), 10);
+
+    setList((prevList: any) =>
+      prevList.map((task: any) => (task.id === id ? { ...task, status: newStatus } : task))
+    );
+  };
+
+  const allowDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+  };
+
   return (
     <div className="container-fluid p-0">
       <div className="row g-2">
         {statusList.map((status: any, ind: number) => (
-          <div key={ind} className="col-sm-4 col-12">
+          <div key={ind} className="col-sm-4 col-12" onDragOver={allowDrop} onDrop={(event) => onDrop(event, status.title)}>
             <Card title={status.title} icon={status.icon}>
               <div className="overflow-auto sc-l-height">
                 <Division list={list.filter((task) => task.status === status.title)} setList={setList} />
